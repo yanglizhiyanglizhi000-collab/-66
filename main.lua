@@ -1,0 +1,133 @@
+require "import"
+import "android.app.*"
+import "android.os.*"
+import "android.widget.*"
+import "android.view.*"
+import "layout"
+import "AndLua"
+activity.setTheme(R.Theme_Blue)
+activity.setTitle("MyApp1")
+activity.setContentView(loadlayout(layout))
+隐藏标题栏()
+沉浸状态栏()
+
+import "xfc"----悬浮窗代码
+import "xfq"----悬浮窗代码
+import "android.content.Context"----悬浮窗代码
+import "android.provider.Settings"----悬浮窗代码
+import "android.graphics.PixelFormat"----悬浮窗代码
+wmManager=activity.getSystemService(Context.WINDOW_SERVICE) --获取窗口管理器
+HasFocus=false --是否有焦点
+wmParams =WindowManager.LayoutParams() --对象
+if tonumber(Build.VERSION.SDK) >= 26 then
+  wmParams.type =WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY--安卓8以上悬浮窗打开方式
+ else
+  wmParams.type =WindowManager.LayoutParams.TYPE_SYSTEM_ALERT--安卓8以下的悬浮窗打开方式
+end
+import "android.graphics.PixelFormat" --导入
+wmParams.format =PixelFormat.RGBA_8888 --设置背景
+wmParams.flags=WindowManager.LayoutParams().FLAG_NOT_FOCUSABLE--焦点设置
+wmParams.gravity = Gravity.LEFT| Gravity.TOP --重力设置
+wmParams.x = activity.getWidth()/6
+wmParams.y = activity.getHeight()/5
+wmParams.width =WindowManager.LayoutParams.WRAP_CONTENT
+wmParams.height =WindowManager.LayoutParams.WRAP_CONTENT
+if Build.VERSION.SDK_INT >= Build.VERSION_CODES.M&&!Settings.canDrawOverlays(this) then
+  print("没有悬浮窗权限悬，请打开权限")
+  intent=Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+  intent.setData(Uri.parse("package:" .. activity.getPackageName()));
+  activity.startActivityForResult(intent, 100)
+  os.exit()
+ else
+  悬浮球=loadlayout(xfq)--悬浮球
+  悬浮窗=loadlayout(xfc)--悬浮窗
+end
+
+
+function 开启.onClick()--开启悬浮窗代
+
+  if 悬浮球是否打开 ==nil then
+    wmManager.addView(悬浮球,wmParams)
+    悬浮球是否打开=true
+   else
+    MD提示("你以启动悬浮窗",0xFF2196F3,0xFFFFFFFF,4,10)
+  end
+end
+
+
+function 放大()--放大悬浮窗代码
+  wmManager.addView(悬浮窗,wmParams )
+  wmManager.removeView(悬浮球)
+end
+
+
+function 隐藏()--隐藏悬浮窗代码
+  wmManager.removeView(悬浮窗)
+  wmManager.addView(悬浮球,wmParams )
+end
+
+function 关闭()--退出悬浮窗代码
+  wmManager.removeView(悬浮窗)
+  悬浮球是否打开=nil
+end
+function 窗体.OnTouchListener(v,event) --移动
+  if event.getAction()==MotionEvent.ACTION_DOWN then
+    firstX=event.getRawX()
+    firstY=event.getRawY()
+    wmX=wmParams.x
+    wmY=wmParams.y
+   elseif event.getAction()==MotionEvent.ACTION_MOVE then
+    wmParams.x=wmX+(event.getRawX()-firstX)
+    wmParams.y=wmY+(event.getRawY()-firstY)
+    wmManager.updateViewLayout(悬浮窗,wmParams)
+   elseif event.getAction()==MotionEvent.ACTION_UP then
+    --changeWindow()
+  end
+
+  return false
+end--看情况使用
+
+function 图标.OnTouchListener(v,event)--这个图标移动代码
+  if event.getAction()==MotionEvent.ACTION_DOWN then
+    firstX=event.getRawX()
+    firstY=event.getRawY()
+    wmX=wmParams.x
+    wmY=wmParams.y
+   elseif event.getAction()==MotionEvent.ACTION_MOVE then
+    wmParams.x=wmX+(event.getRawX()-firstX)
+    wmParams.y=wmY+(event.getRawY()-firstY)
+    wmManager.updateViewLayout(悬浮球,wmParams)
+   elseif event.getAction()==MotionEvent.ACTION_UP then
+  end
+  return false
+end
+
+
+--远程公告
+url="https://sharechain.qq.com/143e12d8dd718cf0a2e43ececf03bbd9"
+Http.get(url,function(a,b)
+  公告开关=b:match("公告开关【(.-)】")
+  if a==200 then--再加一个if语句操控公告
+    if 公告开关=="开" then
+      内容=b:match("公告【(.-)】")
+      --加一个弹窗让他显示出来
+      AlertDialog.Builder(this)
+      .setTitle("荔枝公告")
+      .setMessage(内容)--这里是消息
+      .setPositiveButton("关闭",function()
+        os.exit()--关闭软件
+      end)
+      .setNeutralButton("欢迎使用",nil)
+      .setCancelable(false)--点击空白无法关闭，强制退出软件！
+      .show();
+     else
+      --这里没有公告
+
+      Toast.makeText(activity,"/", Toast.LENGTH_LONG).show()
+    end
+   else
+
+  end
+end)
+
+
