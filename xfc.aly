@@ -1,0 +1,25 @@
+{
+  LinearLayout;
+  layout_height="fill";
+  layout_width="300dp";
+  orientation="horizontal";
+  id="窗体";
+  {
+    LinearLayout;
+    layout_height="100dp";
+    orientation="vertical";
+    layout_width="100dp";
+    {
+      Button;
+      onClick="隐藏";
+      id="yc";
+      text="隐藏";
+    };
+    {
+      Button;
+      onClick="关闭";
+      id="gb";
+      text="关闭";
+    };
+  };
+};
