@@ -1,0 +1,13 @@
+{
+  LinearLayout;
+  layout_width="fill";
+  layout_height="fill";
+  {
+    CircleImageView;
+    src="icon.png";
+    onClick="放大";
+    layout_width="45dp";
+    layout_height="45dp";
+    id="图标";
+  };
+};
