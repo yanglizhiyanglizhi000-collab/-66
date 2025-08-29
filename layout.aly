@@ -1,0 +1,12 @@
+{
+  LinearLayout;
+  orientation="vertical";
+  layout_width="fill";
+  gravity="center";
+  layout_height="fill";
+  {
+    Button;
+    text="启动悬浮窗";
+    id="开启";
+  };
+};
