@@ -1,0 +1,59 @@
+-- 初始化设置
+WindUI:SetNotificationLower(true)
+WindUI:SetFont("rbxassetid://font-id-here")
+WindUI:SetTheme("Dark")
+
+-- 添加自定义主题
+WindUI:AddTheme({
+    Name = "Dark",
+    Accent = "#18181b",
+    Dialog = "#18181b",
+    Outline = "#FFFFFF",
+    Text = "#FFFFFF",
+    Placeholder = "#999999",
+    Background = "#0e0e10",
+    Button = "#52525b",
+    Icon = "#a1a1aa",
+})
+
+-- 创建窗口和标签页
+local Window = WindUI:Window({
+    Title = "Your Hub Name",
+    Icon = "settings",
+    Size = UDim2.new(0, 500, 0, 400)
+})
+
+local Tab = Window:Tab({
+    Title = "Main Tab",
+    Icon = "home",
+    Locked = false,
+})
+
+-- 选择标签页
+Window:SelectTab(1)
+
+-- 添加标签
+Window:Tag({
+    Title = "v1.6.4",
+    Color = Color3.fromHex("#30ff6a")
+})
+
+-- 弹出窗口示例
+WindUI:Popup({
+    Title = "Welcome",
+    Icon = "info",
+    Content = "Welcome to the hub!",
+    Buttons = {
+        {
+            Title = "Close",
+            Callback = function() end,
+            Variant = "Tertiary",
+        },
+        {
+            Title = "Continue",
+            Icon = "arrow-right",
+            Callback = function() end,
+            Variant = "Primary",
+        }
+    }
+})
