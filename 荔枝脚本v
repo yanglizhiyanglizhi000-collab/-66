@@ -1,3 +1,5 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
 -- 初始化设置
 WindUI:SetNotificationLower(true)
 WindUI:SetFont("rbxassetid://font-id-here")
@@ -16,16 +18,66 @@ WindUI:AddTheme({
     Icon = "#a1a1aa",
 })
 
--- 创建窗口和标签页
-local Window = WindUI:Window({
-    Title = "Your Hub Name",
+-- 创建窗口并配置密钥系统
+local Window = WindUI:CreateWindow({
+    Title = "Premium Hub",
     Icon = "settings",
-    Size = UDim2.new(0, 500, 0, 400)
+    Size = UDim2.new(0, 500, 0, 400),
+    
+    KeySystem = {
+        Note = "Example Key System. With platoboost, etc.",
+        API = {
+            { -- PlatoBoost
+                Title = "Platoboost", 
+                Desc = "Click to copy your key.",
+                Icon = "rbxassetid://",
+                Type = "platoboost",
+                ServiceId = 1234,
+                Secret = "platoboost-secret",
+            },
+            { -- Panda development
+                Title = "Panda Development",
+                Desc = "Get your key from Panda",
+                Icon = "rbxassetid://",
+                Type = "pandadevelopment",
+                ServiceId = "myServiceId",
+            },
+        },
+    },
 })
 
-local Tab = Window:Tab({
-    Title = "Main Tab",
+-- 窗口设置
+Window:SetBackgroundImage("rbxassetid://id-here")
+Window:SetBackgroundImageTransparency(0.3)
+Window:SetToggleKey(Enum.KeyCode.H)
+Window:ToggleTransparency(true)
+Window:IsResizable(false)
+
+-- 设置打开UI的按钮
+Window:EditOpenButton({
+    Title = "Open Premium UI",
+    Icon = "monitor",
+    CornerRadius = UDim.new(0,16),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0F7B"), 
+        Color3.fromHex("F89B29")
+    ),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+-- 创建标签页
+local MainTab = Window:Tab({
+    Title = "Main Features",
     Icon = "home",
+    Locked = false,
+})
+
+local SettingsTab = Window:Tab({
+    Title = "Settings",
+    Icon = "settings",
     Locked = false,
 })
 
@@ -38,11 +90,11 @@ Window:Tag({
     Color = Color3.fromHex("#30ff6a")
 })
 
--- 弹出窗口示例
+-- 弹出欢迎窗口
 WindUI:Popup({
-    Title = "Welcome",
+    Title = "Welcome to Premium Hub",
     Icon = "info",
-    Content = "Welcome to the hub!",
+    Content = "Thank you for using our service!",
     Buttons = {
         {
             Title = "Close",
@@ -50,10 +102,27 @@ WindUI:Popup({
             Variant = "Tertiary",
         },
         {
-            Title = "Continue",
+            Title = "Get Started",
             Icon = "arrow-right",
             Callback = function() end,
             Variant = "Primary",
         }
     }
+})
+
+-- 在标签页中添加一些元素示例
+MainTab:Button({
+    Title = "Example Button",
+    Description = "This is a sample button",
+    Callback = function()
+        print("Button clicked!")
+    end
+})
+
+MainTab:Toggle({
+    Title = "Example Toggle",
+    Description = "Enable/disable feature",
+    Callback = function(value)
+        print("Toggle state:", value)
+    end
 })
