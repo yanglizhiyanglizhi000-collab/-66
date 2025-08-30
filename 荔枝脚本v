@@ -1,126 +1,204 @@
--- 初始化设置
-WindUI:SetNotificationLower(true)
-WindUI:SetFont("rbxassetid://font-id-here")
-WindUI:SetTheme("Dark")
 
--- 添加自定义主题
-WindUI:AddTheme({
-    Name = "Dark",
-    Accent = "#18181b",
-    Dialog = "#18181b",
-    Outline = "#FFFFFF",
-    Text = "#FFFFFF",
-    Placeholder = "#999999",
-    Background = "#0e0e10",
-    Button = "#52525b",
-    Icon = "#a1a1aa",
-})
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
--- 创建窗口并配置密钥系统
-local Window = WindUI:CreateWindow({
-    Title = "Premium Hub",
-    Icon = "settings",
-    Size = UDim2.new(0, 500, 0, 400),
-    
-    KeySystem = {
-        Note = "Example Key System. With platoboost, etc.",
-        API = {
-            { -- PlatoBoost
-                Title = "Platoboost", 
-                Desc = "Click to copy your key.",
-                Icon = "rbxassetid://",
-                Type = "platoboost",
-                ServiceId = 1234,
-                Secret = "platoboost-secret",
-            },
-            { -- Panda development
-                Title = "Panda Development",
-                Desc = "Get your key from Panda",
-                Icon = "rbxassetid://",
-                Type = "pandadevelopment",
-                ServiceId = "myServiceId",
-            },
-        },
-    },
-})
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- 窗口设置
-Window:SetBackgroundImage("rbxassetid://id-here")
-Window:SetBackgroundImageTransparency(0.3)
-Window:SetToggleKey(Enum.KeyCode.H)
-Window:ToggleTransparency(true)
-Window:IsResizable(false)
+local function IsMobile()
+    return UserInputService.TouchEnabled and not UserInputService.MouseEnabled
+end
 
--- 设置打开UI的按钮
-Window:EditOpenButton({
-    Title = "Open Premium UI",
-    Icon = "monitor",
-    CornerRadius = UDim.new(0,16),
-    StrokeThickness = 2,
-    Color = ColorSequence.new(
-        Color3.fromHex("FF0F7B"), 
-        Color3.fromHex("F89B29")
-    ),
-    OnlyMobile = false,
-    Enabled = true,
-    Draggable = true,
-})
+local function GetScreenSize()
+    local viewport = workspace.CurrentCamera.ViewportSize
+    return viewport.X, viewport.Y
+end
 
--- 创建标签页
-local MainTab = Window:Tab({
-    Title = "Main Features",
-    Icon = "home",
-    Locked = false,
-})
+local function GetAdaptiveSize()
+    local screenWidth, screenHeight = GetScreenSize()
+    local isMobile = IsMobile()
 
-local SettingsTab = Window:Tab({
-    Title = "Settings",
-    Icon = "settings",
-    Locked = false,
-})
+    if isMobile then
 
--- 选择标签页
-Window:SelectTab(1)
+        local width = math.min(screenWidth * 0.85, 420)
+        local height = math.min(screenHeight * 0.65, 500)
+        return UDim2.new(0, width, 0, height)
+    else
 
--- 添加标签
-Window:Tag({
-    Title = "v1.6.4",
-    Color = Color3.fromHex("#30ff6a")
-})
+        local width = math.min(520, screenWidth * 0.8)
+        local height = math.min(520 * 0.618, screenHeight * 0.8)
+        return UDim2.new(0, width, 0, height)
+    end
+end
 
--- 弹出欢迎窗口
-WindUI:Popup({
-    Title = "Welcome to Premium Hub",
-    Icon = "info",
-    Content = "Thank you for using our service!",
-    Buttons = {
-        {
-            Title = "Close",
-            Callback = function() end,
-            Variant = "Tertiary",
-        },
-        {
-            Title = "Get Started",
-            Icon = "arrow-right",
-            Callback = function() end,
-            Variant = "Primary",
+local function GetAdaptivePosition(size)
+    local isMobile = IsMobile()
+
+    if isMobile then
+
+        return UDim2.new(0.5, -size.X.Offset/2, 0.5, -size.Y.Offset/2)
+    else
+
+        return UDim2.new(0, -size.X.Offset - 100, 0.5, -size.Y.Offset/2)
+    end
+end
+
+local function GetGameListSize()
+    local screenWidth, screenHeight = GetScreenSize()
+    local isMobile = IsMobile()
+
+    if isMobile then
+
+        local width = math.min(screenWidth * 0.9, 380)
+        local height = math.min(screenHeight * 0.8, 550)
+        return UDim2.new(0, width, 0, height)
+    else
+
+        return UDim2.new(0, 450, 0, 600)
+    end
+end
+
+local function GetDeveloperPageSize()
+    local screenWidth, screenHeight = GetScreenSize()
+    local isMobile = IsMobile()
+
+    if isMobile then
+
+        local width = math.min(screenWidth * 0.92, 400)
+        local height = math.min(screenHeight * 0.85, 580)
+        return UDim2.new(0, width, 0, height)
+    else
+
+        return UDim2.new(0, 600, 0, 520)
+    end
+end
+
+local function cleanupAllGuis()
+    for _, gui in pairs(playerGui:GetChildren()) do
+        if gui.Name == "XiProLoader" or gui.Name == "XiProGameList" then
+            gui:Destroy()
+        end
+    end
+end
+
+local function createParticle(parent)
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
+    particle.Position = UDim2.new(math.random(0, 100)/100, 0, math.random(0, 100)/100, 0)
+    particle.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+    particle.BackgroundTransparency = math.random(30, 70)/100
+    particle.BorderSizePixel = 0
+    particle.ZIndex = 6
+    particle.Parent = parent
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0.5, 0)
+    corner.Parent = particle
+    spawn(function()
+        while particle.Parent do
+            local moveInfo = TweenInfo.new(math.random(20, 40)/10, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+            local newPos = UDim2.new(math.random(0, 100)/100, 0, math.random(0, 100)/100, 0)
+            local moveTween = TweenService:Create(particle, moveInfo, {Position = newPos})
+            moveTween:Play()
+            wait(math.random(20, 40)/10)
+        end
+    end)
+end
+
+local function GetAsset(v)
+    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    return game:GetService("HttpService"):JSONDecode(request({
+        Url = v,
+        Headers = {
+            Authorization = "Bearer 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"
         }
+    }).Body).content:gsub('[^'..b..'=]', ''):gsub('.', function(x)
+        if (x == '=') then return '' end
+        local r,f='',(b:find(x)-1)
+        for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and '1' or '0') end
+        return r;
+    end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
+        if (#x ~= 8) then return '' end
+        local c=0
+        for i=1,8 do c=c+(x:sub(i,i)=='1' and 2^(8-i) or 0) end
+        return string.char(c)
+    end)
+end
+
+local function showLoadingAnimation(onComplete)
+    cleanupAllGuis()
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "XiProLoader"
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screenGui.ResetOnSpawn = false
+    screenGui.IgnoreGuiInset = true
+    screenGui.Parent = playerGui
+
+    local background = Instance.new("Frame")
+    background.Size = UDim2.new(1, 0, 1, 0)
+    background.Position = UDim2.new(0, 0, 0, 0)
+    background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    background.BackgroundTransparency = 0.3
+    background.BorderSizePixel = 0
+    background.ZIndex = 1
+    background.Parent = screenGui
+
+    local backgroundGradient = Instance.new("UIGradient")
+    backgroundGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 15, 35)),
+        ColorSequenceKeypoint.new(0.3, Color3.fromRGB(5, 8, 20)),
+        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(0, 0, 0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 20, 40))
     }
-})
+    backgroundGradient.Rotation = 45
+    backgroundGradient.Parent = background
 
--- 在标签页中添加一些元素示例
-MainTab:Button({
-    Title = "Example Button",
-    Description = "This is a sample button",
-    Callback = function()
-        print("Button clicked!")
-    end
-})
+    spawn(function()
+        while background.Parent do
+            local rotateInfo = TweenInfo.new(12, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true)
+            local rotateTween = TweenService:Create(backgroundGradient, rotateInfo, {Rotation = 135})
+            rotateTween:Play()
+            wait(12)
+        end
+    end)
 
-MainTab:Toggle({
-    Title = "Example Toggle",
-    Description = "Enable/disable feature",
-    Callback = function(value)
-        print("Toggle state:", value)
-    end
-})
+    local mainContainer = Instance.new("Frame")
+    local adaptiveSize = GetAdaptiveSize()
+    mainContainer.Size = adaptiveSize
+    mainContainer.Position = GetAdaptivePosition(adaptiveSize)
+    mainContainer.BackgroundColor3 = Color3.fromRGB(18, 25, 45)
+    mainContainer.BackgroundTransparency = 0.02
+    mainContainer.BorderSizePixel = 0
+    mainContainer.ZIndex = 3
+    mainContainer.Parent = screenGui
+
+    local mainCorner = Instance.new("UICorner")
+    mainCorner.CornerRadius = UDim.new(0, 28)
+    mainCorner.Parent = mainContainer
+
+    local shadowStroke1 = Instance.new("UIStroke")
+    shadowStroke1.Thickness = 20
+    shadowStroke1.Color = Color3.fromRGB(0, 0, 0)
+    shadowStroke1.Transparency = 0.95
+    shadowStroke1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    shadowStroke1.Parent = mainContainer
+
+    local shadowStroke2 = Instance.new("UIStroke")
+    shadowStroke2.Thickness = 12
+    shadowStroke2.Color = Color3.fromRGB(0, 0, 0)
+    shadowStroke2.Transparency = 0.8
+    shadowStroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    shadowStroke2.Parent = mainContainer
+
+    local shadowStroke3 = Instance.new("UIStroke")
+    shadowStroke3.Thickness = 6
+    shadowStroke3.Color = Color3.fromRGB(0, 0, 0)
+    shadowStroke3.Transparency = 0.6
+    shadowStroke3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    shadowStroke3.Parent = mainContainer
+
+    local mainStroke = Instance.new("UIStroke")
+    mainStroke.Thickness = 3
+    mainStroke.Color = Color3.fromRGB(100, 150, 255
